@@ -114,7 +114,6 @@ async function run() {
       }
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
-      console.log(result)
   })
 
       // cart related apis
@@ -129,14 +128,12 @@ async function run() {
         console.log(newItem);
         const result = await cartCollection.insertOne(newItem);
         res.send(result);
-        console.log(result);
     });
     app.delete('/cart/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
       res.send(result);
-      console.log(result);
   })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
