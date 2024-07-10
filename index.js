@@ -25,10 +25,9 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     //await client.connect();
 
-    const brandCollection = client.db("brandDB").collection("brand");
-    const productsCollection = client.db("brandDB").collection("products");
-    const userCollection = client.db("brandDB").collection("users");
-    const cartCollection = client.db("brandDB").collection("cart");
+    const brandCollection = client.db("MjSportsDB").collection("brand");
+    const productsCollection = client.db("MjSportsDB").collection("products");
+    const cartCollection = client.db("MjSportsDB").collection("cart");
 
     // products data
     app.get("/products", async (req, res) => {
@@ -53,27 +52,33 @@ async function run() {
       res.send(result);
     });
 
-    app.put('/products/:id', async (req, res) => {
+    app.put("/products/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) }
+      const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updateProduct = req.body;
 
       const product = {
-          $set: {
-            productName: updateProduct.productName,
-            brandName: updateProduct.brandName,
-            ProductType: updateProduct.ProductType,
-            Price: updateProduct.Price,
-            rating: updateProduct.rating,
-            picture: updateProduct.picture,
-          }
-      }
+        $set: {
+          productName: updateProduct.productName,
+          brandName: updateProduct.brandName,
+          category: updateProduct.category,
+          stockQuantity: updateProduct.stockQuantity,
+          description: updateProduct.description,
+          Price: updateProduct.Price,
+          rating: updateProduct.rating,
+          picture: updateProduct.picture,
+        },
+      };
 
-      const result = await productsCollection.updateOne(filter, product, options);
+      const result = await productsCollection.updateOne(
+        filter,
+        product,
+        options
+      );
       res.send(result);
-      console.log(result)
-  })
+      console.log(result);
+    });
 
     // Brands data
     app.get("/brand", async (req, res) => {
@@ -89,52 +94,25 @@ async function run() {
       res.send(result);
     });
 
-    // user related apis
-    app.get('/users', async (req, res) => {
-      const cursor = userCollection.find();
-      const users = await cursor.toArray();
-      res.send(users);
-  })
-
-  app.post('/users', async (req, res) => {
-      const user = req.body;
-      console.log(user);
-      const result = await userCollection.insertOne(user);
+    // cart related apis
+    app.get("/cart", async (req, res) => {
+      const cursor = cartCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
-  });
-
-  app.patch('/users', async (req, res) => {
-      const user = req.body;
-      const filter = { email: user.email }
-      const updateDoc = {
-          $set: {
-            uid: user.uid,
-            lastLoggedAt: user?.lastLoggedAt,
-          }
-      }
-      const result = await userCollection.updateOne(filter, updateDoc);
-      res.send(result);
-  })
-
-      // cart related apis
-      app.get('/cart', async (req, res) => {
-        const cursor = cartCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
-    })
-  
-    app.post('/cart', async (req, res) => {
-        const newItem = req.body;
-        console.log(newItem);
-        const result = await cartCollection.insertOne(newItem);
-        res.send(result);
     });
-    app.delete('/cart/:id', async (req, res) => {
+
+    app.post("/cart", async (req, res) => {
+      const newItem = req.body;
+      console.log(newItem);
+      const result = await cartCollection.insertOne(newItem);
+      res.send(result);
+    });
+    app.delete("/cart/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
       res.send(result);
-  })
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -148,9 +126,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Turbo Tide server is running");
+  res.send("MJ Sports server is running... ⚽");
 });
 
 app.listen(port, () => {
-  console.log(`Turbo Tide server is running on port: ${port}`);
+  console.log(`MJ Sports server is running on port: ${port}`);
 });
